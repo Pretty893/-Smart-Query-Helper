@@ -96,6 +96,47 @@ class DocumentService:
             "document": updated_record,
         }
 
+    def delete_document(self, document_id):
+        record = self.storage.get_document_by_id(document_id)
+        if not record:
+            return {
+                "status": "not_found",
+                "message": "未找到对应的知识文档。",
+            }
+
+        title = record.get("title", "未命名文档")
+        try:
+            if record.get("status") == "success":
+                self._get_vector_store().delete_document(
+                    document_id=document_id,
+                    chunk_count=record.get("chunk_count", 0),
+                )
+
+            raw_path = record.get("raw_path")
+            if raw_path:
+                raw_file = config.BASE_DIR / raw_path
+                if raw_file.exists():
+                    raw_file.unlink()
+
+            deleted = self.storage.delete_document(document_id)
+            if not deleted:
+                return {
+                    "status": "not_found",
+                    "message": "未找到对应的知识文档。",
+                }
+        except Exception as exc:
+            return {
+                "status": "failed",
+                "message": f"删除《{title}》失败：{exc}",
+                "document": record,
+            }
+
+        return {
+            "status": "success",
+            "message": f"已删除《{title}》，并同步移除原始文件与知识库索引。",
+            "document": record,
+        }
+
     def seed_sample_documents(self):
         results = []
         for sample in config.SAMPLE_DOCS:

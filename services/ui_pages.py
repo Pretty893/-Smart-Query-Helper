@@ -118,6 +118,7 @@ def render_upload_page():
 
 def render_management_page():
     storage = JsonStorageService()
+    document_service = DocumentService()
     stats = storage.get_stats()
     _render_api_key_notice()
 
@@ -140,6 +141,34 @@ def render_management_page():
         st.dataframe(document_frame, use_container_width=True, hide_index=True)
     else:
         st.info("暂无文档记录。")
+
+    st.subheader("删除已上传知识")
+    if documents:
+        document_options = {
+            _build_document_option_label(document): document["id"]
+            for document in documents
+        }
+        selected_label = st.selectbox(
+            "选择需要删除的文档",
+            options=list(document_options.keys()),
+            key="delete_document_selector",
+        )
+        st.caption("删除后会同步移除原始文件和向量索引；历史问答与反馈记录会保留，便于继续演示使用痕迹。")
+        confirm_delete = st.checkbox("我确认删除这份知识文档", key="confirm_delete_document")
+        if st.button("删除选中文档", type="primary", key="delete_document_button"):
+            if not confirm_delete:
+                st.warning("请先勾选确认项，再执行删除。")
+            else:
+                result = document_service.delete_document(document_options[selected_label])
+                if result["status"] == "success":
+                    st.success(result["message"])
+                    st.rerun()
+                elif result["status"] == "not_found":
+                    st.warning(result["message"])
+                else:
+                    st.error(result["message"])
+    else:
+        st.info("当前没有可删除的文档。")
 
     st.divider()
     st.subheader("最近问答")
@@ -320,3 +349,12 @@ def _show_upload_result(result):
         st.info(result["message"])
     else:
         st.error(result["message"])
+
+
+def _build_document_option_label(document):
+    return (
+        f"{document.get('title', '未命名文档')} | "
+        f"{document.get('category', '未分类')} | "
+        f"{document.get('version', '-')} | "
+        f"{document.get('file_name', '-')}"
+    )

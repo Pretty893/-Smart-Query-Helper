@@ -30,6 +30,14 @@ class OfficeMateVectorStore:
         self.vector_store.add_texts(chunks, metadatas=metadatas, ids=ids)
         return len(chunks)
 
+    def delete_document(self, document_id, chunk_count=0):
+        chunk_total = int(chunk_count or 0)
+        if chunk_total > 0:
+            ids = [f"{document_id}-{index}" for index in range(chunk_total)]
+            self.vector_store.delete(ids=ids)
+            return
+        self.vector_store.delete(where={"document_id": document_id})
+
     def search(self, query, category="全部", limit=None):
         filters = None if category == "全部" else {"category": category}
         limit = limit or config.similarity_threshold

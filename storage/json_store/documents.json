@@ -48,38 +48,6 @@
     "uploaded_at": "2026-03-18 18:18:17"
   },
   {
-    "file_hash": "345ed821c8c77cbedae81653f28e20441dc7b9fc650d45e7c094517e866c6ee4",
-    "file_name": "采购申请流程.txt",
-    "file_type": "txt",
-    "title": "采购申请流程",
-    "category": "行政流程",
-    "version": "v2026.01",
-    "source_label": "sample_docs",
-    "raw_path": "storage\\raw_documents\\345ed821c8c7_采购申请流程.txt",
-    "text_length": 317,
-    "chunk_count": 1,
-    "status": "success",
-    "error": "",
-    "id": "8b658dd1bfa44c6d907fe06a899ab6d7",
-    "uploaded_at": "2026-03-18 18:18:18"
-  },
-  {
-    "file_hash": "49c38461878bc8e4e6df54a91b1220325b712cde113e275797994d2cb7053846",
-    "file_name": "IT服务台常见问题.txt",
-    "file_type": "txt",
-    "title": "IT服务台常见问题",
-    "category": "IT支持",
-    "version": "v2026.02",
-    "source_label": "sample_docs",
-    "raw_path": "storage\\raw_documents\\49c38461878b_IT服务台常见问题.txt",
-    "text_length": 384,
-    "chunk_count": 1,
-    "status": "success",
-    "error": "",
-    "id": "7c09748811884aa8900049bd3b276d21",
-    "uploaded_at": "2026-03-18 18:18:18"
-  },
-  {
     "file_hash": "da5bd8009591966b7b3001b4a8d5f1c8a4cd7748a8e5e80a44ffa49a7ec9e17f",
     "file_name": "入职与权限开通流程.txt",
     "file_type": "txt",

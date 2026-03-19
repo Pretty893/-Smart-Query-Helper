@@ -34,6 +34,12 @@ class JsonStorageService:
     def list_documents(self):
         return self._sort_desc(self._read_records(config.DOCUMENT_INDEX_PATH), "uploaded_at")
 
+    def get_document_by_id(self, document_id):
+        for record in self._read_records(config.DOCUMENT_INDEX_PATH):
+            if record.get("id") == document_id:
+                return record
+        return None
+
     def get_document_by_hash(self, file_hash):
         for record in self._read_records(config.DOCUMENT_INDEX_PATH):
             if record.get("file_hash") == file_hash:
@@ -60,6 +66,14 @@ class JsonStorageService:
                 break
         self._write_records(config.DOCUMENT_INDEX_PATH, records)
         return updated
+
+    def delete_document(self, document_id):
+        records = self._read_records(config.DOCUMENT_INDEX_PATH)
+        remaining_records = [record for record in records if record.get("id") != document_id]
+        if len(remaining_records) == len(records):
+            return False
+        self._write_records(config.DOCUMENT_INDEX_PATH, remaining_records)
+        return True
 
     def list_qa_logs(self, limit=None):
         records = self._sort_desc(self._read_records(config.QA_LOG_PATH), "created_at")
