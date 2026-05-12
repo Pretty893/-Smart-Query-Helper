@@ -1,4 +1,4 @@
-﻿from io import BytesIO
+﻿from io import BytesIO#创建一个内存中的二进制流对象，可以像文件一样读写，但数据存储在内存而非磁盘。
 from pathlib import Path
 
 import pandas as pd

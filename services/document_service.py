@@ -107,18 +107,18 @@ class DocumentService:
         title = record.get("title", "未命名文档")
         try:
             if record.get("status") == "success":
-                self._get_vector_store().delete_document(
+                self._get_vector_store().delete_document(#删除向量库中的文档片段
                     document_id=document_id,
                     chunk_count=record.get("chunk_count", 0),
                 )
 
             raw_path = record.get("raw_path")
             if raw_path:
-                raw_file = config.BASE_DIR / raw_path
+                raw_file = config.BASE_DIR / raw_path#删除原始文件
                 if raw_file.exists():
-                    raw_file.unlink()
+                    raw_file.unlink()#删除
 
-            deleted = self.storage.delete_document(document_id)
+            deleted = self.storage.delete_document(document_id)#删除索引记录
             if not deleted:
                 return {
                     "status": "not_found",

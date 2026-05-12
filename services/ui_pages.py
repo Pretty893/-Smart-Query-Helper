@@ -25,8 +25,6 @@ def render_chat_page():
     for message in st.session_state["chat_messages"]:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
-            if message["role"] == "assistant" and message.get("qa_log_id"):
-                _render_feedback_form(storage, message)
 
     prompt = st.chat_input("例如：报销差旅费需要提交哪些材料？")
     if prompt:
@@ -51,7 +49,6 @@ def render_chat_page():
                     "question": prompt,
                 }
                 st.markdown(assistant_message["content"])
-                _render_feedback_form(storage, assistant_message)
                 st.session_state["chat_messages"].append(assistant_message)
             except Exception as exc:
                 error_message = (
@@ -123,13 +120,12 @@ def render_management_page():
     _render_api_key_notice()
 
     st.title("知识管理")
-    st.caption("查看文档状态、问答记录和用户反馈，便于演示知识库闭环。")
+    st.caption("查看文档状态、问答记录，便于演示知识库闭环。")
 
-    metric_columns = st.columns(4)
+    metric_columns = st.columns(3)
     metric_columns[0].metric("文档数量", stats["document_count"])
     metric_columns[1].metric("覆盖分类", stats["category_count"])
     metric_columns[2].metric("问答记录", stats["qa_count"])
-    metric_columns[3].metric("反馈数量", stats["feedback_count"])
 
     st.divider()
     st.subheader("文档列表")
@@ -145,15 +141,15 @@ def render_management_page():
     st.subheader("删除已上传知识")
     if documents:
         document_options = {
-            _build_document_option_label(document): document["id"]
+            _build_document_option_label(document): document["id"]#也就是左边那么多一串都是字典的键，对应右边的值id？
             for document in documents
         }
         selected_label = st.selectbox(
             "选择需要删除的文档",
             options=list(document_options.keys()),
-            key="delete_document_selector",
+            key="delete_document_selector",#区分st.selectbox和st.checkbox 组件
         )
-        st.caption("删除后会同步移除原始文件和向量索引；历史问答与反馈记录会保留，便于继续演示使用痕迹。")
+        st.caption("删除后会同步移除原始文件和向量索引；历史问答记录会保留，便于继续演示使用痕迹。")
         confirm_delete = st.checkbox("我确认删除这份知识文档", key="confirm_delete_document")
         if st.button("删除选中文档", type="primary", key="delete_document_button"):
             if not confirm_delete:
@@ -183,27 +179,6 @@ def render_management_page():
     else:
         st.info("暂无问答记录。")
 
-    st.divider()
-    st.subheader("用户反馈")
-    feedback_logs = storage.list_feedback()
-    if feedback_logs:
-        qa_lookup = {record["id"]: record for record in storage.list_qa_logs()}
-        feedback_rows = []
-        for feedback in feedback_logs:
-            qa_log = qa_lookup.get(feedback["qa_log_id"], {})
-            feedback_rows.append(
-                {
-                    "created_at": feedback.get("updated_at", feedback.get("created_at", "")),
-                    "rating": _rating_to_label(feedback.get("rating", "")),
-                    "comment": feedback.get("comment", ""),
-                    "question": qa_log.get("question", ""),
-                    "session_id": feedback.get("session_id", ""),
-                }
-            )
-        st.dataframe(pd.DataFrame(feedback_rows), use_container_width=True, hide_index=True)
-    else:
-        st.info("暂无反馈记录。")
-
 
 def _render_api_key_notice():
     if not os.getenv("DASHSCOPE_API_KEY"):
@@ -217,12 +192,12 @@ def _init_chat_session(storage):
     if "selected_category" not in st.session_state:
         st.session_state["selected_category"] = "全部"
 
-    if "chat_messages" not in st.session_state:
+    if "chat_messages" not in st.session_state:#没有就创建
         st.session_state["chat_messages"] = _load_messages_from_logs(
             storage,
             st.session_state["session_id"],
         )
-        if not st.session_state["chat_messages"]:
+        if not st.session_state["chat_messages"]:#如果为空，就创建一个默认的
             st.session_state["chat_messages"] = [
                 {
                     "role": "assistant",
@@ -261,14 +236,6 @@ def _render_chat_sidebar(storage):
             st.rerun()
 
         st.divider()
-        st.subheader("推荐问题")
-        st.markdown(
-            "- 年假最晚需要提前几天申请？\n"
-            "- 报销差旅费需要哪些材料？\n"
-            "- 采购一台显示器应该怎么走流程？\n"
-            "- VPN 连接失败怎么处理？"
-        )
-
         st.divider()
         stats = storage.get_stats()
         st.caption(
@@ -292,54 +259,7 @@ def _load_messages_from_logs(storage, session_id):
     return messages
 
 
-def _render_feedback_form(storage, message):
-    qa_log_id = message.get("qa_log_id")
-    if not qa_log_id:
-        return
 
-    existing_feedback = storage.get_feedback_by_qa_log_id(qa_log_id) or {}
-    rating_options = ["未评价", "有帮助", "需改进"]
-    default_rating = _rating_to_label(existing_feedback.get("rating", ""))
-    default_index = rating_options.index(default_rating) if default_rating in rating_options else 0
-
-    with st.expander("反馈", expanded=False):
-        rating_label = st.radio(
-            "这条回答是否有帮助？",
-            rating_options,
-            index=default_index,
-            horizontal=True,
-            key=f"rating_{qa_log_id}",
-        )
-        comment = st.text_input(
-            "补充说明",
-            value=existing_feedback.get("comment", ""),
-            key=f"comment_{qa_log_id}",
-        )
-        if st.button("保存反馈", key=f"save_feedback_{qa_log_id}"):
-            storage.upsert_feedback(
-                qa_log_id=qa_log_id,
-                rating=_label_to_rating(rating_label),
-                comment=comment,
-                session_id=st.session_state["session_id"],
-            )
-            st.success("反馈已保存。")
-
-
-def _label_to_rating(label):
-    return {
-        "未评价": "unrated",
-        "有帮助": "helpful",
-        "需改进": "needs_improvement",
-    }.get(label, "unrated")
-
-
-def _rating_to_label(rating):
-    return {
-        "helpful": "有帮助",
-        "needs_improvement": "需改进",
-        "unrated": "未评价",
-        "": "未评价",
-    }.get(rating, "未评价")
 
 
 def _show_upload_result(result):

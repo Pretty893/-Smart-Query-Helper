@@ -1,7 +1,7 @@
 from pathlib import Path
 
 
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = Path(__file__).resolve().parent#获取当前文件的绝对路径
 APP_NAME = "OfficeMate"
 
 STORAGE_DIR = BASE_DIR / "storage"
@@ -11,7 +11,6 @@ SAMPLE_DOC_DIR = BASE_DIR / "sample_docs"
 
 DOCUMENT_INDEX_PATH = JSON_STORE_DIR / "documents.json"
 QA_LOG_PATH = JSON_STORE_DIR / "qa_logs.json"
-FEEDBACK_PATH = JSON_STORE_DIR / "feedback_logs.json"
 
 DOCUMENT_CATEGORIES = [
     "员工手册",
@@ -101,7 +100,7 @@ def ensure_runtime_dirs() -> None:
     JSON_STORE_DIR.mkdir(parents=True, exist_ok=True)
     Path(persist_directory).mkdir(parents=True, exist_ok=True)
 
-    for path in (DOCUMENT_INDEX_PATH, QA_LOG_PATH, FEEDBACK_PATH):
+    for path in (DOCUMENT_INDEX_PATH, QA_LOG_PATH):
         if not path.exists():
             path.write_text("[]", encoding="utf-8")
 

@@ -12,12 +12,12 @@ class OfficeMateVectorStore:
             chunk_size=config.chunk_size,
             chunk_overlap=config.chunk_overlap,
             separators=config.separators,
-            length_function=len,
+            length_function=len,#怎么计算字符长度
         )
         self.vector_store = Chroma(
-            collection_name=config.collection_name,
+            collection_name=config.collection_name,#名字
             embedding_function=self.embedding,
-            persist_directory=config.persist_directory,
+            persist_directory=config.persist_directory,#路径
         )
 
     def add_document(self, document_id, text, metadata):
@@ -35,7 +35,7 @@ class OfficeMateVectorStore:
         if chunk_total > 0:
             ids = [f"{document_id}-{index}" for index in range(chunk_total)]
             self.vector_store.delete(ids=ids)
-            return
+            return 
         self.vector_store.delete(where={"document_id": document_id})
 
     def search(self, query, category="全部", limit=None):

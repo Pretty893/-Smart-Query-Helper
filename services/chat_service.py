@@ -122,7 +122,7 @@ class OfficeMateChatService:
         return "\n\n".join(blocks)
 
     def _build_references(self, search_results):
-        references = []
+        references = []#每个元素都是一个文档的信息，包括文档id、标题、分类、版本、文件名、相似度得分
         seen_document_ids = set()
         for document, score in search_results:
             document_id = document.metadata.get("document_id")
