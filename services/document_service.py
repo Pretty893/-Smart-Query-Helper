@@ -1,17 +1,41 @@
 ﻿import hashlib
+import json
 from pathlib import Path
 
 import config_data as config
 from services.document_parser import DocumentParser
 from services.storage_service import JsonStorageService
 from services.vector_store import OfficeMateVectorStore
+from langchain_community.chat_models.tongyi import ChatTongyi
+from langchain_core.output_parsers import JsonOutputParser
+from langchain_core.prompts import ChatPromptTemplate
 
+
+OUTLINE_EXTRACTION_PROMPT = ChatPromptTemplate.from_messages([
+    (
+        "system",
+        """你是一个文档大纲提取专家。请分析文档内容，提取结构化的章节大纲。
+
+输出格式必须是 JSON，包含一个 sections 数组，每个元素包含：
+- title: 章节标题
+- level: 层级（1-5）
+- content_summary: 该章节的内容摘要
+- keywords: 该章节的关键词数组（3-5个）
+
+请只输出 JSON，不要包含任何其他内容。""",
+    ),
+    ("human", "文档内容：\n{content}"),
+])
+#层级，一级标题，二级标题，三级标题，四级标题，五级标题，六级标题，内容摘要，关键词
 
 class DocumentService:
     def __init__(self):
         self.storage = JsonStorageService()
         self.parser = DocumentParser()
         self.vector_store = None
+        self.chat_model = ChatTongyi(model=config.chat_model_name)
+        self.outline_parser = JsonOutputParser()
+        self.outline_chain = OUTLINE_EXTRACTION_PROMPT | self.chat_model | self.outline_parser
 
     def ingest_uploaded_file(self, uploaded_file, category, version, custom_title=""):
         title = custom_title.strip() or Path(uploaded_file.name).stem
@@ -57,6 +81,8 @@ class DocumentService:
             record = self.storage.add_document(record_payload)
 
         try:
+            outline = self._extract_outline(text) if config.ENABLE_STRUCTURED_INDEX else []
+            #返回len(chunks)
             chunk_count = self._get_vector_store().add_document(
                 document_id=record["id"],
                 text=text,
@@ -66,6 +92,7 @@ class DocumentService:
                     "version": version,
                     "file_name": file_name,
                     "uploaded_at": record["uploaded_at"],
+                    "outline": json.dumps(outline, ensure_ascii=False),
                 },
             )
             updated_record = self.storage.update_document(
@@ -74,6 +101,7 @@ class DocumentService:
                     "chunk_count": chunk_count,
                     "status": "success",
                     "error": "",
+                    "outline": json.dumps(outline, ensure_ascii=False),
                 },
             )
         except Exception as exc:
@@ -137,7 +165,7 @@ class DocumentService:
             "document": record,
         }
 
-    def seed_sample_documents(self):
+    def seed_sample_documents(self):#导入示例文档
         results = []
         for sample in config.SAMPLE_DOCS:
             file_path = config.SAMPLE_DOC_DIR / sample["file_name"]
@@ -166,3 +194,46 @@ class DocumentService:
         if self.vector_store is None:
             self.vector_store = OfficeMateVectorStore()
         return self.vector_store
+
+    def _extract_outline(self, text):
+        try:
+            result = self.outline_chain.invoke({"content": text[:8000]})
+            if isinstance(result, dict) and "sections" in result:
+                return result["sections"]
+            return []
+        except Exception:
+            return self._fallback_extract_outline(text)
+
+    def _fallback_extract_outline(self, text):
+        sections = []
+        lines = text.split("\n")
+        current_level = 1
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+            
+            if line.startswith("###"):
+                current_level = 3
+                title = line[3:].strip()
+            elif line.startswith("##"):
+                current_level = 2
+                title = line[2:].strip()
+            elif line.startswith("#"):
+                current_level = 1
+                title = line[1:].strip()
+            elif len(line) < 50 and line[0].isupper() and (":" in line or "。" in line):
+                current_level = 2
+                title = line
+            else:
+                continue
+            
+            if title and len(title) < 100:
+                sections.append({
+                    "title": title,
+                    "level": current_level,
+                    "content_summary": "",
+                    "keywords": [],
+                })
+        
+        return sections

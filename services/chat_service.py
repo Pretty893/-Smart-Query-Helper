@@ -1,11 +1,29 @@
-﻿from langchain_core.messages import AIMessage, HumanMessage
+﻿import sys
+import os
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_community.chat_models.tongyi import ChatTongyi
 
 import config_data as config
 from services.storage_service import JsonStorageService
 from services.vector_store import OfficeMateVectorStore
+from services.complex_query_handler import ComplexQueryHandler
+from services.grounding_verifier import GroundingVerifier
+from services.structured_output_extractor import StructuredOutputExtractor
+
+enterprise_rag_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "enterprise-rag")
+sys.path.insert(0, enterprise_rag_path)
+
+from scripts.query_router import QueryRouter
+from scripts.retriever_vector import VectorRetriever
+from scripts.retriever_bm25 import BM25Retriever
+from scripts.retriever_hybrid import HybridRetriever
+from scripts.prompt_selector import PromptSelector
+from scripts.tool_caller import ToolCaller
+from scripts.post_processor import PostProcessor
 
 
 class OfficeMateChatService:
@@ -13,33 +31,61 @@ class OfficeMateChatService:
         self.storage = JsonStorageService()
         self.vector_store = None
         self.chat_model = None
-        self.prompt_template = ChatPromptTemplate.from_messages(
-            [
-                (
-                    "system",
-                    "你是 OfficeMate，负责回答企业内部制度与流程问题。"
-                    "你只能依据给定的参考材料回答，不能编造制度、审批规则或联系方式。"
-                    "如果材料不足，请明确写“未找到明确依据”。"
-                    "输出必须严格使用以下 Markdown 标题："
-                    "### 最终回答\n### 操作步骤/材料清单\n### 风险提示\n"
-                    "如果某一部分不适用，请写“无”。",
-                ),
-                MessagesPlaceholder("history"),
-                (
-                    "human",
-                    "当前任务类型：{question_type}\n"
-                    "当前分类过滤：{category}\n\n"
-                    "参考材料如下：\n{context}\n\n"
-                    "用户问题：{question}",
-                ),
-            ]
+        self.complex_handler = ComplexQueryHandler()
+        self.grounding_verifier = GroundingVerifier()
+        self.structured_extractor = StructuredOutputExtractor()
+
+        self.query_router = QueryRouter()
+        self.prompt_selector = PromptSelector()
+        self.tool_caller = ToolCaller()
+        self.post_processor = PostProcessor()
+
+        self.retrievers = {
+            "vector": VectorRetriever(),
+            "bm25": BM25Retriever(),
+            "hybrid": HybridRetriever(),
+        }
+
+    def _init_retrievers(self):
+        vs = self._get_vector_store()
+        for name, retriever in self.retrievers.items():
+            retriever.vector_store = vs
+
+    def answer_question(self, question, session_id, category="全部", enable_deep_analysis=None):
+        deep_analysis_enabled = enable_deep_analysis if enable_deep_analysis is not None else config.ENABLE_DEEP_ANALYSIS
+
+        self._init_retrievers()
+
+        route_result = self.query_router.route(question)
+        intent_type = route_result["intent_type"]
+        question_type = route_result["intent_label"]
+        retriever_strategy = route_result["retriever_strategy"]
+
+        analysis = {
+            "intent_type": intent_type,
+            "intent_label": question_type,
+            "retriever_strategy": retriever_strategy,
+            "is_complex": intent_type == "complex",
+            "entities": [],
+            "constraints": [],
+        }
+
+        if intent_type == "complex":
+            return self._handle_complex_question(
+                question, session_id, category, question_type, analysis, deep_analysis_enabled
+            )
+
+        return self._handle_simple_question(
+            question, session_id, category, question_type, analysis, deep_analysis_enabled
         )
 
-    def answer_question(self, question, session_id, category="全部"):
-        question_type_key = self.infer_question_type(question)
-        question_type = config.QUESTION_TYPE_LABELS[question_type_key]
-        search_results = self._get_vector_store().search(question, category=category)
-        references = self._build_references(search_results)
+    def _handle_simple_question(self, question, session_id, category, question_type, analysis, deep_analysis_enabled):
+        history = self._build_history(session_id)
+        retriever_strategy = analysis.get("retriever_strategy", "hybrid")
+
+        search_results = self._skill_based_search(question, category, retriever_strategy)
+
+        references = self._build_references_from_skill_results(search_results)
 
         if not references:
             answer = config.NO_EVIDENCE_MESSAGE + "\n\n### 引用文档\n无"
@@ -51,6 +97,9 @@ class OfficeMateChatService:
                     "category": category,
                     "question_type": question_type,
                     "source_docs": [],
+                    "analysis": analysis,
+                    "grounding_result": {"verified": False, "summary": {"overall_risk_level": "medium"}},
+                    "structured_data": {},
                 }
             )
             return {
@@ -58,21 +107,46 @@ class OfficeMateChatService:
                 "question_type": question_type,
                 "qa_log_id": qa_log["id"],
                 "source_docs": [],
+                "analysis": analysis,
+                "grounding_result": {"verified": False, "summary": {"overall_risk_level": "medium"}},
+                "structured_data": {},
             }
 
-        history = self._build_history(session_id)
-        context = self._build_context(search_results)
-        chain = self.prompt_template | self._get_chat_model() | StrOutputParser()
+        context = self._build_context_from_skill_results(search_results)
+        prompt = self.prompt_selector.select(analysis["intent_type"])
+        chain = prompt | self._get_chat_model() | StrOutputParser()
+
         answer_body = chain.invoke(
             {
-                "question_type": question_type,
-                "category": category,
                 "context": context,
                 "question": question,
                 "history": history,
             }
         )
         full_answer = f"{answer_body.strip()}\n\n### 引用文档\n{self._format_reference_markdown(references)}"
+
+        grounding_result = {"verified": False, "summary": {"overall_risk_level": "medium"}}
+        if deep_analysis_enabled and config.ENABLE_GROUNDING_VERIFICATION:
+            grounding_result = self.grounding_verifier.verify(full_answer, context)
+
+            if config.ENABLE_SELF_RAG and grounding_result.get("summary", {}).get("overall_risk_level") == "high":
+                search_results = self._skill_based_search(question, category, "hybrid")
+                references = self._build_references_from_skill_results(search_results)
+                context = self._build_context_from_skill_results(search_results)
+                answer_body = chain.invoke(
+                    {
+                        "context": context,
+                        "question": question,
+                        "history": history,
+                    }
+                )
+                full_answer = f"{answer_body.strip()}\n\n### 引用文档\n{self._format_reference_markdown(references)}"
+                grounding_result = self.grounding_verifier.verify(full_answer, context)
+
+        structured_data = {}
+        if deep_analysis_enabled and config.ENABLE_STRUCTURED_EXTRACTION:
+            structured_data = self.structured_extractor.extract(full_answer)
+
         qa_log = self.storage.add_qa_log(
             {
                 "session_id": session_id,
@@ -81,6 +155,9 @@ class OfficeMateChatService:
                 "category": category,
                 "question_type": question_type,
                 "source_docs": references,
+                "analysis": analysis,
+                "grounding_result": grounding_result,
+                "structured_data": structured_data,
             }
         )
 
@@ -89,17 +166,87 @@ class OfficeMateChatService:
             "question_type": question_type,
             "qa_log_id": qa_log["id"],
             "source_docs": references,
+            "analysis": analysis,
+            "grounding_result": grounding_result,
+            "structured_data": structured_data,
         }
 
-    def infer_question_type(self, question):
-        lowered = question.lower()
-        if any(keyword in lowered for keyword in ("材料", "附件", "提交什么", "要带什么", "需要什么")):
-            return "material_list"
-        if any(keyword in lowered for keyword in ("流程", "步骤", "怎么走", "怎么发起", "如何办理")):
-            return "process_guide"
-        if any(keyword in lowered for keyword in ("总结", "概括", "通知重点", "提炼")):
-            return "notice_summary"
-        return "policy_qa"
+    def _handle_complex_question(self, question, session_id, category, question_type, analysis, deep_analysis_enabled):
+        answer_body, references = self.complex_handler.handle(question, category)
+
+        if not references:
+            answer = config.NO_EVIDENCE_MESSAGE + "\n\n### 引用文档\n无"
+            qa_log = self.storage.add_qa_log(
+                {
+                    "session_id": session_id,
+                    "question": question,
+                    "answer": answer,
+                    "category": category,
+                    "question_type": question_type,
+                    "source_docs": [],
+                    "analysis": analysis,
+                    "grounding_result": {"verified": False, "summary": {"overall_risk_level": "medium"}},
+                    "structured_data": {},
+                }
+            )
+            return {
+                "answer": answer,
+                "question_type": question_type,
+                "qa_log_id": qa_log["id"],
+                "source_docs": [],
+                "analysis": analysis,
+                "grounding_result": {"verified": False, "summary": {"overall_risk_level": "medium"}},
+                "structured_data": {},
+            }
+
+        context = self._build_context_for_references(references)
+        full_answer = f"{answer_body.strip()}\n\n### 引用文档\n{self._format_reference_markdown(references)}"
+
+        grounding_result = {"verified": False, "summary": {"overall_risk_level": "medium"}}
+        if deep_analysis_enabled and config.ENABLE_GROUNDING_VERIFICATION:
+            grounding_result = self.grounding_verifier.verify(full_answer, context)
+
+        structured_data = {}
+        if deep_analysis_enabled and config.ENABLE_STRUCTURED_EXTRACTION:
+            structured_data = self.structured_extractor.extract(full_answer)
+
+        qa_log = self.storage.add_qa_log(
+            {
+                "session_id": session_id,
+                "question": question,
+                "answer": full_answer,
+                "category": category,
+                "question_type": question_type,
+                "source_docs": references,
+                "analysis": analysis,
+                "grounding_result": grounding_result,
+                "structured_data": structured_data,
+            }
+        )
+
+        return {
+            "answer": full_answer,
+            "question_type": question_type,
+            "qa_log_id": qa_log["id"],
+            "source_docs": references,
+            "analysis": analysis,
+            "grounding_result": grounding_result,
+            "structured_data": structured_data,
+        }
+
+    def _skill_based_search(self, question, category, strategy="hybrid"):
+        retriever = self.retrievers.get(strategy, self.retrievers["hybrid"])
+
+        try:
+            if strategy == "hybrid":
+                return retriever.search_with_rrf(question, category=category)
+            else:
+                return retriever.search(question, category=category)
+        except RuntimeError as e:
+            if "阿里云账号欠费" in str(e):
+                raise
+        except Exception:
+            return self._get_vector_store().search(question, category=category)
 
     def _build_history(self, session_id):
         logs = self.storage.list_session_logs(session_id, limit=config.max_history_rounds)
@@ -109,33 +256,55 @@ class OfficeMateChatService:
             messages.append(AIMessage(content=log["answer"]))
         return messages
 
-    def _build_context(self, search_results):
+    def _build_context_from_skill_results(self, search_results):
         blocks = []
-        for index, (document, score) in enumerate(search_results[: config.max_reference_documents], start=1):
+        for index, (doc, meta, score) in enumerate(search_results[: config.max_reference_documents], start=1):
             blocks.append(
-                f"[{index}] 标题：{document.metadata.get('title', document.metadata.get('file_name', '未命名文档'))}\n"
-                f"分类：{document.metadata.get('category', '未分类')} | "
-                f"版本：{document.metadata.get('version', '未填写')} | "
+                f"[{index}] 标题：{meta.get('title', meta.get('file_name', '未命名文档'))}\n"
+                f"分类：{meta.get('category', '未分类')} | "
+                f"版本：{meta.get('version', '未填写')} | "
                 f"相似度得分：{score:.4f}\n"
-                f"内容：{document.page_content[:600]}"
+                f"内容：{doc[:600]}"
             )
         return "\n\n".join(blocks)
 
-    def _build_references(self, search_results):
-        references = []#每个元素都是一个文档的信息，包括文档id、标题、分类、版本、文件名、相似度得分
+    def _build_context_for_references(self, references):
+        blocks = []
+        for index, ref in enumerate(references[: config.max_reference_documents], start=1):
+            search_results = self._get_vector_store().search(
+                ref["title"],
+                category=ref["category"],
+                limit=1,
+            )
+            content = ""
+            for document, _ in search_results:
+                if document.metadata.get("document_id") == ref["document_id"]:
+                    content = document.page_content[:600]
+                    break
+
+            blocks.append(
+                f"[{index}] 标题：{ref['title']}\n"
+                f"分类：{ref['category']} | "
+                f"版本：{ref['version']} | "
+                f"内容：{content}"
+            )
+        return "\n\n".join(blocks)
+
+    def _build_references_from_skill_results(self, search_results):
+        references = []
         seen_document_ids = set()
-        for document, score in search_results:
-            document_id = document.metadata.get("document_id")
+        for doc, meta, score in search_results:
+            document_id = meta.get("document_id")
             if document_id in seen_document_ids:
                 continue
             seen_document_ids.add(document_id)
             references.append(
                 {
                     "document_id": document_id,
-                    "title": document.metadata.get("title", document.metadata.get("file_name", "未命名文档")),
-                    "category": document.metadata.get("category", "未分类"),
-                    "version": document.metadata.get("version", "未填写"),
-                    "file_name": document.metadata.get("file_name", ""),
+                    "title": meta.get("title", meta.get("file_name", "未命名文档")),
+                    "category": meta.get("category", "未分类"),
+                    "version": meta.get("version", "未填写"),
+                    "file_name": meta.get("file_name", ""),
                     "score": round(float(score), 4),
                 }
             )
@@ -161,3 +330,17 @@ class OfficeMateChatService:
         if self.chat_model is None:
             self.chat_model = ChatTongyi(model=config.chat_model_name)
         return self.chat_model
+
+    def call_tool(self, tool_name, **kwargs):
+        return self.tool_caller.call_tool(tool_name, **kwargs)
+
+    def post_process(self, answer, action="summary", **kwargs):
+        if action == "summary":
+            return self.post_processor.generate_summary(answer, **kwargs)
+        elif action == "translate":
+            return self.post_processor.translate(answer, **kwargs)
+        elif action == "format":
+            return self.post_processor.format_answer(answer, **kwargs)
+        elif action == "highlight":
+            return self.post_processor.add_highlights(answer, **kwargs)
+        return answer

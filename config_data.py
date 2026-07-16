@@ -47,12 +47,25 @@ NO_EVIDENCE_MESSAGE = (
     "在没有明确制度依据前，请不要直接执行流程，建议联系对应部门进一步确认。"
 )
 
+ENABLE_QUERY_EXPANSION = True
+ENABLE_HYBRID_SEARCH = True
+ENABLE_SELF_RAG = True
+ENABLE_STRUCTURED_INDEX = True
+
+QUERY_EXPANSION_COUNT = 2
+SELF_RAG_MAX_RETRIES = 1
+
 QUESTION_TYPE_LABELS = {
     "policy_qa": "制度问答",
     "process_guide": "流程指引",
     "material_list": "材料清单",
     "notice_summary": "通知总结",
+    "complex": "复杂问题",
 }
+
+ENABLE_DEEP_ANALYSIS = True
+ENABLE_GROUNDING_VERIFICATION = True
+ENABLE_STRUCTURED_EXTRACTION = True
 
 SAMPLE_DOCS = [
     {

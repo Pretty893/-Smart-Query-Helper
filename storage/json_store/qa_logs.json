@@ -1060,5 +1060,370 @@
     ],
     "id": "206c1eab73d040c9b36e28441c989b18",
     "created_at": "2026-05-12 15:02:19"
+  },
+  {
+    "session_id": "officemate_aa05a199",
+    "question": "我想请年假，怎么做",
+    "answer": "### 最终回答\n根据《请假与考勤制度》（v2026.01），员工申请年假应至少提前 2 个工作日提交请假流程，并由直属主管审批。若连续请假 3 天及以上，除直属主管外，还需部门负责人审批。\n\n### 操作步骤/材料清单\n1. **提前申请**：至少在休假开始前 2 个工作日发起请假流程。\n2. **提交系统申请**：通过公司规定的请假系统（如企业协同系统）填写年假申请。\n3. **审批流程**：\n   - 所有年假申请需直属主管审批；\n   - 若连续请假 ≥3 天，还需部门负责人审批。\n4. **无需额外材料**：年假申请一般不需要附加证明材料，但需确保年假余额充足。\n\n### 风险提示\n- 未提前 2 个工作日申请可能导致审批不及时，影响休假安排。\n- 连续请假 3 天及以上但未获得部门负责人审批的，流程可能被驳回或视为无效请假。\n- 年假应在有效期内使用，逾期未休且未延期的，可能按制度自动清零（具体以 HR 政策为准，本材料未说明）。\n\n### 引用文档\n1. 请假与考勤制度 | 分类：HR制度 | 版本：v2026.01 | 文件：请假与考勤制度.txt\n2. 员工手册（节选） | 分类：员工手册 | 版本：v2026.03 | 文件：员工手册.txt\n3. 入职与权限开通流程 | 分类：综合公告 | 版本：v2026.01 | 文件：入职与权限开通流程.txt\n4. 差旅与报销制度 | 分类：财务制度 | 版本：v2026.02 | 文件：差旅与报销制度.txt",
+    "category": "全部",
+    "question_type": "制度问答",
+    "source_docs": [
+      {
+        "document_id": "4262ce1a90094d859777ac524c900415",
+        "title": "请假与考勤制度",
+        "category": "HR制度",
+        "version": "v2026.01",
+        "file_name": "请假与考勤制度.txt",
+        "score": 0.7723
+      },
+      {
+        "document_id": "1e98e920a00f41e6a5d566f74e5a6888",
+        "title": "员工手册（节选）",
+        "category": "员工手册",
+        "version": "v2026.03",
+        "file_name": "员工手册.txt",
+        "score": 1.0561
+      },
+      {
+        "document_id": "35319153f42042f598dc11a164358120",
+        "title": "入职与权限开通流程",
+        "category": "综合公告",
+        "version": "v2026.01",
+        "file_name": "入职与权限开通流程.txt",
+        "score": 1.1702
+      },
+      {
+        "document_id": "db6f742016814373a294c3fb8146eb45",
+        "title": "差旅与报销制度",
+        "category": "财务制度",
+        "version": "v2026.02",
+        "file_name": "差旅与报销制度.txt",
+        "score": 1.258
+      }
+    ],
+    "id": "4e98259756174e51beb14010e53218c5",
+    "created_at": "2026-06-23 17:42:24"
+  },
+  {
+    "session_id": "officemate_745f7db2",
+    "question": "午休时间是怎么安排的",
+    "answer": "### 最终回答\n公司午休时间为 12:00 至 13:00。\n\n### 操作步骤/材料清单\n无\n\n### 风险提示\n无\n\n### 引用文档\n1. 员工手册（节选） | 分类：员工手册 | 版本：v2026.03 | 文件：员工手册.txt\n2. 请假与考勤制度 | 分类：HR制度 | 版本：v2026.01 | 文件：请假与考勤制度.txt\n3. 入职与权限开通流程 | 分类：综合公告 | 版本：v2026.01 | 文件：入职与权限开通流程.txt\n4. 差旅与报销制度 | 分类：财务制度 | 版本：v2026.02 | 文件：差旅与报销制度.txt",
+    "category": "全部",
+    "question_type": "制度问答",
+    "source_docs": [
+      {
+        "document_id": "1e98e920a00f41e6a5d566f74e5a6888",
+        "title": "员工手册（节选）",
+        "category": "员工手册",
+        "version": "v2026.03",
+        "file_name": "员工手册.txt",
+        "score": 0.9643
+      },
+      {
+        "document_id": "4262ce1a90094d859777ac524c900415",
+        "title": "请假与考勤制度",
+        "category": "HR制度",
+        "version": "v2026.01",
+        "file_name": "请假与考勤制度.txt",
+        "score": 1.0345
+      },
+      {
+        "document_id": "35319153f42042f598dc11a164358120",
+        "title": "入职与权限开通流程",
+        "category": "综合公告",
+        "version": "v2026.01",
+        "file_name": "入职与权限开通流程.txt",
+        "score": 1.3135
+      },
+      {
+        "document_id": "db6f742016814373a294c3fb8146eb45",
+        "title": "差旅与报销制度",
+        "category": "财务制度",
+        "version": "v2026.02",
+        "file_name": "差旅与报销制度.txt",
+        "score": 1.3897
+      }
+    ],
+    "id": "bfef698fde7746e7b40f58ec1530c9c0",
+    "created_at": "2026-06-24 13:08:52"
+  },
+  {
+    "session_id": "officemate_f8fc34c7",
+    "question": "你好",
+    "answer": "### 最终回答\n你好！请问有什么关于公司制度或流程的问题我可以帮您解答吗？\n\n### 操作步骤/材料清单\n无\n\n### 风险提示\n无\n\n### 引用文档\n1. 入职与权限开通流程 | 分类：综合公告 | 版本：v2026.01 | 文件：入职与权限开通流程.txt\n2. 员工手册（节选） | 分类：员工手册 | 版本：v2026.03 | 文件：员工手册.txt\n3. 请假与考勤制度 | 分类：HR制度 | 版本：v2026.01 | 文件：请假与考勤制度.txt\n4. 差旅与报销制度 | 分类：财务制度 | 版本：v2026.02 | 文件：差旅与报销制度.txt",
+    "category": "全部",
+    "question_type": "制度问答",
+    "source_docs": [
+      {
+        "document_id": "35319153f42042f598dc11a164358120",
+        "title": "入职与权限开通流程",
+        "category": "综合公告",
+        "version": "v2026.01",
+        "file_name": "入职与权限开通流程.txt",
+        "score": 1.4669
+      },
+      {
+        "document_id": "1e98e920a00f41e6a5d566f74e5a6888",
+        "title": "员工手册（节选）",
+        "category": "员工手册",
+        "version": "v2026.03",
+        "file_name": "员工手册.txt",
+        "score": 1.5568
+      },
+      {
+        "document_id": "4262ce1a90094d859777ac524c900415",
+        "title": "请假与考勤制度",
+        "category": "HR制度",
+        "version": "v2026.01",
+        "file_name": "请假与考勤制度.txt",
+        "score": 1.5795
+      },
+      {
+        "document_id": "db6f742016814373a294c3fb8146eb45",
+        "title": "差旅与报销制度",
+        "category": "财务制度",
+        "version": "v2026.02",
+        "file_name": "差旅与报销制度.txt",
+        "score": 1.7193
+      }
+    ],
+    "id": "2a3adb1de5de4e34ac7a0c74818027bb",
+    "created_at": "2026-06-24 15:20:38"
+  },
+  {
+    "session_id": "officemate_94bab5dd",
+    "question": "怎么请年假",
+    "answer": "### 最终回答\n员工申请年假应至少提前 2 个工作日提交请假流程，并由直属主管审批。若连续请假 3 天及以上，除直属主管审批外，还需部门负责人审批。\n\n### 操作步骤/材料清单\n1. 至少提前 2 个工作日在公司系统中提交年假申请；\n2. 确保直属主管完成审批；\n3. 若连续请假 ≥3 天，还需获得部门负责人审批。\n\n### 风险提示\n未提前申请或审批不完整可能导致请假无效，影响考勤记录及工资核算。\n\n### 引用文档\n1. 请假与考勤制度 | 分类：HR制度 | 版本：v2026.01 | 文件：请假与考勤制度.txt\n2. 员工手册（节选） | 分类：员工手册 | 版本：v2026.03 | 文件：员工手册.txt\n3. 入职与权限开通流程 | 分类：综合公告 | 版本：v2026.01 | 文件：入职与权限开通流程.txt\n4. 差旅与报销制度 | 分类：财务制度 | 版本：v2026.02 | 文件：差旅与报销制度.txt",
+    "category": "全部",
+    "question_type": "制度问答",
+    "source_docs": [
+      {
+        "document_id": "4262ce1a90094d859777ac524c900415",
+        "title": "请假与考勤制度",
+        "category": "HR制度",
+        "version": "v2026.01",
+        "file_name": "请假与考勤制度.txt",
+        "score": 0.7776
+      },
+      {
+        "document_id": "1e98e920a00f41e6a5d566f74e5a6888",
+        "title": "员工手册（节选）",
+        "category": "员工手册",
+        "version": "v2026.03",
+        "file_name": "员工手册.txt",
+        "score": 1.0797
+      },
+      {
+        "document_id": "35319153f42042f598dc11a164358120",
+        "title": "入职与权限开通流程",
+        "category": "综合公告",
+        "version": "v2026.01",
+        "file_name": "入职与权限开通流程.txt",
+        "score": 1.2059
+      },
+      {
+        "document_id": "db6f742016814373a294c3fb8146eb45",
+        "title": "差旅与报销制度",
+        "category": "财务制度",
+        "version": "v2026.02",
+        "file_name": "差旅与报销制度.txt",
+        "score": 1.2462
+      }
+    ],
+    "id": "de421de3f97e4f91a9d78da602db7ddb",
+    "created_at": "2026-06-24 15:49:12"
+  },
+  {
+    "session_id": "officemate_94bab5dd",
+    "question": "我想请年假",
+    "answer": "### 最终回答\n员工申请年假应至少提前 2 个工作日提交请假流程，并由直属主管审批。若连续请假 3 天及以上，除直属主管审批外，还需部门负责人审批。\n\n### 操作步骤/材料清单\n1. 至少提前 2 个工作日在公司系统中提交年假申请；\n2. 等待直属主管审批；\n3. 若连续请假 ≥3 天，还需部门负责人审批。\n\n### 风险提示\n未按规定提前申请或缺少必要审批，可能导致请假无效，影响考勤记录及薪资计算。\n\n### 引用文档\n1. 请假与考勤制度 | 分类：HR制度 | 版本：v2026.01 | 文件：请假与考勤制度.txt\n2. 员工手册（节选） | 分类：员工手册 | 版本：v2026.03 | 文件：员工手册.txt\n3. 差旅与报销制度 | 分类：财务制度 | 版本：v2026.02 | 文件：差旅与报销制度.txt\n4. 入职与权限开通流程 | 分类：综合公告 | 版本：v2026.01 | 文件：入职与权限开通流程.txt",
+    "category": "全部",
+    "question_type": "制度问答",
+    "source_docs": [
+      {
+        "document_id": "4262ce1a90094d859777ac524c900415",
+        "title": "请假与考勤制度",
+        "category": "HR制度",
+        "version": "v2026.01",
+        "file_name": "请假与考勤制度.txt",
+        "score": 0.9247
+      },
+      {
+        "document_id": "1e98e920a00f41e6a5d566f74e5a6888",
+        "title": "员工手册（节选）",
+        "category": "员工手册",
+        "version": "v2026.03",
+        "file_name": "员工手册.txt",
+        "score": 1.1927
+      },
+      {
+        "document_id": "db6f742016814373a294c3fb8146eb45",
+        "title": "差旅与报销制度",
+        "category": "财务制度",
+        "version": "v2026.02",
+        "file_name": "差旅与报销制度.txt",
+        "score": 1.3181
+      },
+      {
+        "document_id": "35319153f42042f598dc11a164358120",
+        "title": "入职与权限开通流程",
+        "category": "综合公告",
+        "version": "v2026.01",
+        "file_name": "入职与权限开通流程.txt",
+        "score": 1.3313
+      }
+    ],
+    "id": "c0497a0b47404a87ba25886e5d6fec25",
+    "created_at": "2026-06-24 15:50:41"
+  },
+  {
+    "session_id": "test_session",
+    "question": "请假流程是什么？",
+    "answer": "### 最终回答\n未找到明确依据，当前知识库中没有足够材料支撑这个问题。\n\n### 操作步骤/材料清单\n请先切换更准确的分类，或补充上传对应制度、流程和通知文档。\n\n### 风险提示\n在没有明确制度依据前，请不要直接执行流程，建议联系对应部门进一步确认。\n\n### 引用文档\n无",
+    "category": "全部",
+    "question_type": "流程指引",
+    "source_docs": [],
+    "analysis": {
+      "intent_type": "process_guide",
+      "intent_label": "流程指引",
+      "retriever_strategy": "hybrid",
+      "is_complex": false,
+      "entities": [],
+      "constraints": []
+    },
+    "grounding_result": {
+      "verified": false,
+      "summary": {
+        "overall_risk_level": "medium"
+      }
+    },
+    "structured_data": {},
+    "id": "2b6f5ed8df1f422db2b15cbf6b7ed0a7",
+    "created_at": "2026-07-02 17:11:48"
+  },
+  {
+    "session_id": "officemate_5499c0e6",
+    "question": "怎么请年假",
+    "answer": "### 最终回答\n未找到明确依据，当前知识库中没有足够材料支撑这个问题。\n\n### 操作步骤/材料清单\n请先切换更准确的分类，或补充上传对应制度、流程和通知文档。\n\n### 风险提示\n在没有明确制度依据前，请不要直接执行流程，建议联系对应部门进一步确认。\n\n### 引用文档\n无",
+    "category": "全部",
+    "question_type": "流程指引",
+    "source_docs": [],
+    "analysis": {
+      "intent_type": "process_guide",
+      "intent_label": "流程指引",
+      "retriever_strategy": "hybrid",
+      "is_complex": false,
+      "entities": [],
+      "constraints": []
+    },
+    "grounding_result": {
+      "verified": false,
+      "summary": {
+        "overall_risk_level": "medium"
+      }
+    },
+    "structured_data": {},
+    "id": "95ffc84500494b3bac0dc5ac7359f32c",
+    "created_at": "2026-07-02 17:20:25"
+  },
+  {
+    "session_id": "officemate_5499c0e6",
+    "question": "我想请年假，要怎么做",
+    "answer": "### 最终回答\n未找到明确依据，当前知识库中没有足够材料支撑这个问题。\n\n### 操作步骤/材料清单\n请先切换更准确的分类，或补充上传对应制度、流程和通知文档。\n\n### 风险提示\n在没有明确制度依据前，请不要直接执行流程，建议联系对应部门进一步确认。\n\n### 引用文档\n无",
+    "category": "全部",
+    "question_type": "流程指引",
+    "source_docs": [],
+    "analysis": {
+      "intent_type": "process_guide",
+      "intent_label": "流程指引",
+      "retriever_strategy": "hybrid",
+      "is_complex": false,
+      "entities": [],
+      "constraints": []
+    },
+    "grounding_result": {
+      "verified": false,
+      "summary": {
+        "overall_risk_level": "medium"
+      }
+    },
+    "structured_data": {},
+    "id": "f7ea7256a9904cb4886db5d3757ae0f3",
+    "created_at": "2026-07-02 17:20:51"
+  },
+  {
+    "session_id": "officemate_5499c0e6",
+    "question": "我想请年假，要怎么做",
+    "answer": "### 最终回答\n未找到明确依据，当前知识库中没有足够材料支撑这个问题。\n\n### 操作步骤/材料清单\n请先切换更准确的分类，或补充上传对应制度、流程和通知文档。\n\n### 风险提示\n在没有明确制度依据前，请不要直接执行流程，建议联系对应部门进一步确认。\n\n### 引用文档\n无",
+    "category": "全部",
+    "question_type": "流程指引",
+    "source_docs": [],
+    "analysis": {
+      "intent_type": "process_guide",
+      "intent_label": "流程指引",
+      "retriever_strategy": "hybrid",
+      "is_complex": false,
+      "entities": [],
+      "constraints": []
+    },
+    "grounding_result": {
+      "verified": false,
+      "summary": {
+        "overall_risk_level": "medium"
+      }
+    },
+    "structured_data": {},
+    "id": "0de9c949a06745b89bf5e7b76a8da474",
+    "created_at": "2026-07-02 17:21:07"
+  },
+  {
+    "session_id": "test_session",
+    "question": "请假流程是什么？",
+    "answer": "### 最终回答\n未找到明确依据，当前知识库中没有足够材料支撑这个问题。\n\n### 操作步骤/材料清单\n请先切换更准确的分类，或补充上传对应制度、流程和通知文档。\n\n### 风险提示\n在没有明确制度依据前，请不要直接执行流程，建议联系对应部门进一步确认。\n\n### 引用文档\n无",
+    "category": "全部",
+    "question_type": "流程指引",
+    "source_docs": [],
+    "analysis": {
+      "intent_type": "process_guide",
+      "intent_label": "流程指引",
+      "retriever_strategy": "hybrid",
+      "is_complex": false,
+      "entities": [],
+      "constraints": []
+    },
+    "grounding_result": {
+      "verified": false,
+      "summary": {
+        "overall_risk_level": "medium"
+      }
+    },
+    "structured_data": {},
+    "id": "835c7286cfe0468db9edf4094ea658d1",
+    "created_at": "2026-07-02 17:30:12"
+  },
+  {
+    "session_id": "test_session",
+    "question": "请假流程是什么？",
+    "answer": "### 最终回答\n未找到明确依据，当前知识库中没有足够材料支撑这个问题。\n\n### 操作步骤/材料清单\n请先切换更准确的分类，或补充上传对应制度、流程和通知文档。\n\n### 风险提示\n在没有明确制度依据前，请不要直接执行流程，建议联系对应部门进一步确认。\n\n### 引用文档\n无",
+    "category": "全部",
+    "question_type": "流程指引",
+    "source_docs": [],
+    "analysis": {
+      "intent_type": "process_guide",
+      "intent_label": "流程指引",
+      "retriever_strategy": "hybrid",
+      "is_complex": false,
+      "entities": [],
+      "constraints": []
+    },
+    "grounding_result": {
+      "verified": false,
+      "summary": {
+        "overall_risk_level": "medium"
+      }
+    },
+    "structured_data": {},
+    "id": "a28fc4d9e34b45028914d748cae33474",
+    "created_at": "2026-07-02 17:53:26"
   }
 ]

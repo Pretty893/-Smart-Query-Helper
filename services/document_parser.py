@@ -36,7 +36,7 @@ class DocumentParser:
         raise ValueError("文本文件编码无法识别，建议转为 UTF-8 后再上传。")
 
     def _parse_pdf(self, file_bytes):
-        reader = PdfReader(BytesIO(file_bytes))
+        reader = PdfReader(BytesIO(file_bytes))#类文件对象，读取不接受bytes类型，需要转换为BytesIO对象
         pages = []
         for page in reader.pages:
             pages.append(page.extract_text() or "")

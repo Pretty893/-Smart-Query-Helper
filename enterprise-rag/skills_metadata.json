@@ -1,0 +1,722 @@
+{
+  "retriever": {
+    "vector_retriever": {
+      "name": "vector_retriever",
+      "description": "基于向量语义相似度检索，适合理解性问题、同义词匹配、语义关联查询，能够捕捉问题与文档之间的语义关系",
+      "skill_type": "retriever",
+      "parameters": {
+        "query": {
+          "type": "string",
+          "description": "用户问题，需要进行语义理解和匹配",
+          "required": true
+        },
+        "category": {
+          "type": "string",
+          "description": "文档分类，用于过滤检索范围",
+          "required": false,
+          "default": "全部"
+        },
+        "limit": {
+          "type": "integer",
+          "description": "返回结果数量限制",
+          "required": false,
+          "default": 5
+        }
+      },
+      "returns": {
+        "type": "list",
+        "description": "文档列表，每个元素包含(doc, meta, score)",
+        "items": {
+          "doc": {
+            "type": "string",
+            "description": "文档内容片段"
+          },
+          "meta": {
+            "type": "object",
+            "description": "文档元数据，包含document_id、title、category等"
+          },
+          "score": {
+            "type": "float",
+            "description": "相似度得分，范围0-1，越高越相似"
+          }
+        }
+      },
+      "tags": [
+        "语义理解",
+        "向量检索",
+        "模糊匹配",
+        "同义词",
+        "语义关联"
+      ],
+      "examples": [
+        "年假怎么请比较合适",
+        "报销政策具体是什么意思",
+        "入职流程相关的规定",
+        "出差补贴标准是怎样的"
+      ],
+      "version": "1.0.0",
+      "class_name": "VectorRetriever"
+    },
+    "bm25_retriever": {
+      "name": "bm25_retriever",
+      "description": "基于关键词的BM25精确匹配检索，适合查找具体条款、材料清单、数字规定等事实性问题，对关键词敏感",
+      "skill_type": "retriever",
+      "parameters": {
+        "query": {
+          "type": "string",
+          "description": "用户问题，需要包含明确的关键词",
+          "required": true
+        },
+        "category": {
+          "type": "string",
+          "description": "文档分类，用于过滤检索范围",
+          "required": false,
+          "default": "全部"
+        },
+        "limit": {
+          "type": "integer",
+          "description": "返回结果数量限制",
+          "required": false,
+          "default": 5
+        }
+      },
+      "returns": {
+        "type": "list",
+        "description": "文档列表，每个元素包含(doc, meta, score)",
+        "items": {
+          "doc": {
+            "type": "string",
+            "description": "文档内容片段"
+          },
+          "meta": {
+            "type": "object",
+            "description": "文档元数据，包含document_id、title、category等"
+          },
+          "score": {
+            "type": "float",
+            "description": "BM25得分，越高越匹配"
+          }
+        }
+      },
+      "tags": [
+        "关键词",
+        "精确匹配",
+        "事实性问题",
+        "条款查询",
+        "材料清单"
+      ],
+      "examples": [
+        "病假最长可以请几天",
+        "试用期多长时间",
+        "报销需要提交什么材料",
+        "餐补标准是多少"
+      ],
+      "version": "1.0.0",
+      "class_name": "BM25Retriever"
+    },
+    "hybrid_retriever": {
+      "name": "hybrid_retriever",
+      "description": "混合检索：向量语义检索 + BM25关键词检索，使用RRF（Reciprocal Rank Fusion）算法融合结果，兼顾语义理解和关键词精确匹配，适合复杂问题",
+      "skill_type": "retriever",
+      "parameters": {
+        "query": {
+          "type": "string",
+          "description": "用户问题，可以是复杂问题或包含多个关键词的问题",
+          "required": true
+        },
+        "category": {
+          "type": "string",
+          "description": "文档分类，用于过滤检索范围",
+          "required": false,
+          "default": "全部"
+        },
+        "limit": {
+          "type": "integer",
+          "description": "返回结果数量限制",
+          "required": false,
+          "default": 5
+        }
+      },
+      "returns": {
+        "type": "list",
+        "description": "文档列表，每个元素包含(doc, meta, score)",
+        "items": {
+          "doc": {
+            "type": "string",
+            "description": "文档内容片段"
+          },
+          "meta": {
+            "type": "object",
+            "description": "文档元数据，包含document_id、title、category等"
+          },
+          "score": {
+            "type": "float",
+            "description": "RRF融合得分，越高越匹配"
+          }
+        }
+      },
+      "tags": [
+        "混合检索",
+        "RRF融合",
+        "复杂问题",
+        "语义+关键词",
+        "综合匹配"
+      ],
+      "examples": [
+        "入职半年的员工请5天年假需要什么手续",
+        "试用期员工报销差旅费有什么限制",
+        "从请假到销假的完整流程是什么",
+        "外地出差需要准备哪些材料"
+      ],
+      "version": "1.0.0",
+      "class_name": "HybridRetriever"
+    }
+  },
+  "tool": {
+    "oa_approval_query": {
+      "name": "oa_approval_query",
+      "description": "查询OA审批进度，获取审批状态、当前步骤、下一步骤、进度百分比等信息",
+      "skill_type": "tool",
+      "parameters": {
+        "approval_id": {
+          "type": "string",
+          "description": "审批单ID，如APR-2026-001",
+          "required": true
+        }
+      },
+      "returns": {
+        "type": "object",
+        "description": "审批进度信息",
+        "properties": {
+          "approval_id": {
+            "type": "string",
+            "description": "审批单ID"
+          },
+          "status": {
+            "type": "string",
+            "description": "审批状态：pending/approved/rejected"
+          },
+          "current_step": {
+            "type": "string",
+            "description": "当前审批步骤"
+          },
+          "next_step": {
+            "type": "string",
+            "description": "下一步骤"
+          },
+          "progress": {
+            "type": "string",
+            "description": "进度百分比"
+          },
+          "approved_by": {
+            "type": "string",
+            "description": "审批人"
+          },
+          "approved_time": {
+            "type": "string",
+            "description": "审批时间"
+          }
+        }
+      },
+      "tags": [
+        "OA审批",
+        "流程查询",
+        "审批进度"
+      ],
+      "examples": [
+        "查询审批单APR-2026-001的进度",
+        "我的请假审批到哪一步了",
+        "报销审批进展如何"
+      ],
+      "version": "1.0.0",
+      "class_name": "OAApprovalTool"
+    },
+    "email_notify": {
+      "name": "email_notify",
+      "description": "发送邮件通知，支持指定收件人、主题和内容",
+      "skill_type": "tool",
+      "parameters": {
+        "to": {
+          "type": "string",
+          "description": "收件人邮箱地址",
+          "required": true
+        },
+        "subject": {
+          "type": "string",
+          "description": "邮件主题",
+          "required": true
+        },
+        "content": {
+          "type": "string",
+          "description": "邮件正文内容",
+          "required": true
+        }
+      },
+      "returns": {
+        "type": "object",
+        "description": "邮件发送结果",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "是否发送成功"
+          },
+          "to": {
+            "type": "string",
+            "description": "收件人"
+          },
+          "subject": {
+            "type": "string",
+            "description": "邮件主题"
+          },
+          "status": {
+            "type": "string",
+            "description": "发送状态"
+          },
+          "message": {
+            "type": "string",
+            "description": "提示信息"
+          }
+        }
+      },
+      "tags": [
+        "邮件通知",
+        "消息推送",
+        "通知发送"
+      ],
+      "examples": [
+        "给张三发送会议通知",
+        "发送报销提醒邮件",
+        "通知员工培训安排"
+      ],
+      "version": "1.0.0",
+      "class_name": "EmailNotifyTool"
+    },
+    "calendar_check": {
+      "name": "calendar_check",
+      "description": "查询会议室可用性，获取指定日期和时间段可用的会议室列表",
+      "skill_type": "tool",
+      "parameters": {
+        "date": {
+          "type": "string",
+          "description": "日期，格式YYYY-MM-DD",
+          "required": true
+        },
+        "time_range": {
+          "type": "string",
+          "description": "时间段，如09:00-10:00",
+          "required": true
+        }
+      },
+      "returns": {
+        "type": "object",
+        "description": "会议室可用性信息",
+        "properties": {
+          "date": {
+            "type": "string",
+            "description": "查询日期"
+          },
+          "time_range": {
+            "type": "string",
+            "description": "查询时间段"
+          },
+          "available_rooms": {
+            "type": "list",
+            "description": "可用会议室列表"
+          },
+          "occupied_rooms": {
+            "type": "list",
+            "description": "已占用会议室列表"
+          }
+        }
+      },
+      "tags": [
+        "会议室",
+        "日程查询",
+        "预约管理"
+      ],
+      "examples": [
+        "明天下午2点有哪些会议室可用",
+        "本周三上午的会议室预订情况",
+        "找一个明天上午9点的会议室"
+      ],
+      "version": "1.0.0",
+      "class_name": "CalendarCheckTool"
+    },
+    "hr_data_query": {
+      "name": "hr_data_query",
+      "description": "查询员工HR数据，包括年假剩余天数、在职状态、部门信息等",
+      "skill_type": "tool",
+      "parameters": {
+        "employee_id": {
+          "type": "string",
+          "description": "员工ID",
+          "required": true
+        },
+        "data_type": {
+          "type": "string",
+          "description": "数据类型：annual_leave/employment_status/department",
+          "required": true
+        }
+      },
+      "returns": {
+        "type": "object",
+        "description": "员工HR数据",
+        "properties": {
+          "annual_leave": {
+            "type": "object",
+            "description": "年假信息"
+          },
+          "employment_status": {
+            "type": "object",
+            "description": "在职状态"
+          },
+          "department": {
+            "type": "object",
+            "description": "部门信息"
+          }
+        }
+      },
+      "tags": [
+        "HR数据",
+        "员工信息",
+        "年假查询"
+      ],
+      "examples": [
+        "查询员工1001的年假剩余天数",
+        "查看张三的在职状态",
+        "李四在哪个部门"
+      ],
+      "version": "1.0.0",
+      "class_name": "HRDataQueryTool"
+    }
+  },
+  "prompt": {
+    "policy_qa_prompt": {
+      "name": "policy_qa_prompt",
+      "description": "制度问答模板，适合查询具体政策规定，如'病假可以请几天'，要求准确引用条款",
+      "skill_type": "prompt",
+      "parameters": {
+        "context": {
+          "type": "string",
+          "description": "参考材料，包含制度条款内容",
+          "required": true
+        },
+        "question": {
+          "type": "string",
+          "description": "用户问题，关于制度规定的查询",
+          "required": true
+        },
+        "history": {
+          "type": "list",
+          "description": "对话历史",
+          "required": false
+        }
+      },
+      "returns": {
+        "type": "string",
+        "description": "包含最终回答、依据条款、风险提示的结构化文本"
+      },
+      "tags": [
+        "制度问答",
+        "政策规定",
+        "条款查询"
+      ],
+      "examples": [
+        "年假天数规定",
+        "加班费标准",
+        "试用期规定"
+      ],
+      "version": "1.0.0",
+      "class_name": "PolicyQAPrompt"
+    },
+    "process_guide_prompt": {
+      "name": "process_guide_prompt",
+      "description": "流程指引模板，适合查询办理流程，如'怎么报销差旅费'，要求分解为清晰步骤",
+      "skill_type": "prompt",
+      "parameters": {
+        "context": {
+          "type": "string",
+          "description": "参考材料，包含流程说明",
+          "required": true
+        },
+        "question": {
+          "type": "string",
+          "description": "用户问题，关于办理流程的查询",
+          "required": true
+        },
+        "history": {
+          "type": "list",
+          "description": "对话历史",
+          "required": false
+        }
+      },
+      "returns": {
+        "type": "string",
+        "description": "包含操作步骤、关键节点、所需材料的结构化文本"
+      },
+      "tags": [
+        "流程指引",
+        "步骤说明",
+        "办理流程"
+      ],
+      "examples": [
+        "报销流程",
+        "请假步骤",
+        "入职手续"
+      ],
+      "version": "1.0.0",
+      "class_name": "ProcessGuidePrompt"
+    },
+    "material_list_prompt": {
+      "name": "material_list_prompt",
+      "description": "材料清单模板，适合查询所需材料，如'报销需要提交什么'，要求分类整理",
+      "skill_type": "prompt",
+      "parameters": {
+        "context": {
+          "type": "string",
+          "description": "参考材料，包含材料要求",
+          "required": true
+        },
+        "question": {
+          "type": "string",
+          "description": "用户问题，关于材料清单的查询",
+          "required": true
+        },
+        "history": {
+          "type": "list",
+          "description": "对话历史",
+          "required": false
+        }
+      },
+      "returns": {
+        "type": "string",
+        "description": "包含必需材料表格和注意事项的结构化文本"
+      },
+      "tags": [
+        "材料清单",
+        "表格格式",
+        "材料要求"
+      ],
+      "examples": [
+        "报销需要什么材料",
+        "入职要带什么",
+        "申请需要提交什么"
+      ],
+      "version": "1.0.0",
+      "class_name": "MaterialListPrompt"
+    },
+    "notice_summary_prompt": {
+      "name": "notice_summary_prompt",
+      "description": "通知总结模板，适合要求总结通知，如'这份通知的重点是什么'，要求提取核心要点",
+      "skill_type": "prompt",
+      "parameters": {
+        "context": {
+          "type": "string",
+          "description": "参考材料，包含通知内容",
+          "required": true
+        },
+        "question": {
+          "type": "string",
+          "description": "用户问题，关于通知总结的请求",
+          "required": true
+        },
+        "history": {
+          "type": "list",
+          "description": "对话历史",
+          "required": false
+        }
+      },
+      "returns": {
+        "type": "string",
+        "description": "包含核心内容、关键要素、重点提醒的结构化文本"
+      },
+      "tags": [
+        "通知总结",
+        "要点提取",
+        "内容概括"
+      ],
+      "examples": [
+        "通知重点是什么",
+        "概括一下这份通知",
+        "提炼核心内容"
+      ],
+      "version": "1.0.0",
+      "class_name": "NoticeSummaryPrompt"
+    },
+    "complex_prompt": {
+      "name": "complex_prompt",
+      "description": "复杂问题分析模板，适合复杂问题，如'从入职到转正的完整流程'，要求多步推理",
+      "skill_type": "prompt",
+      "parameters": {
+        "context": {
+          "type": "string",
+          "description": "参考材料，包含多个制度或流程",
+          "required": true
+        },
+        "question": {
+          "type": "string",
+          "description": "用户问题，复杂问题或需要多步推理",
+          "required": true
+        },
+        "history": {
+          "type": "list",
+          "description": "对话历史",
+          "required": false
+        }
+      },
+      "returns": {
+        "type": "string",
+        "description": "包含问题拆解、分步解答、综合结论的结构化文本"
+      },
+      "tags": [
+        "复杂问题",
+        "多步推理",
+        "综合分析"
+      ],
+      "examples": [
+        "从入职到转正的完整流程",
+        "请5天年假需要什么手续",
+        "报销差旅费有什么限制"
+      ],
+      "version": "1.0.0",
+      "class_name": "ComplexPrompt"
+    }
+  },
+  "post_processor": {
+    "summary_processor": {
+      "name": "summary_processor",
+      "description": "生成文本摘要，将长回答压缩为100-200字的简洁摘要，保留核心结论和关键步骤",
+      "skill_type": "post_processor",
+      "parameters": {
+        "answer": {
+          "type": "string",
+          "description": "需要摘要的原始回答文本",
+          "required": true
+        },
+        "max_length": {
+          "type": "integer",
+          "description": "摘要最大长度",
+          "required": false,
+          "default": 200
+        }
+      },
+      "returns": {
+        "type": "string",
+        "description": "压缩后的摘要文本"
+      },
+      "tags": [
+        "摘要",
+        "压缩",
+        "内容提炼"
+      ],
+      "examples": [
+        "将回答压缩成200字以内",
+        "提炼核心观点",
+        "生成简短摘要"
+      ],
+      "version": "1.0.0",
+      "class_name": "SummaryProcessor"
+    },
+    "translation_processor": {
+      "name": "translation_processor",
+      "description": "翻译文本，支持多种目标语言，保持专业术语的准确性和格式结构",
+      "skill_type": "post_processor",
+      "parameters": {
+        "answer": {
+          "type": "string",
+          "description": "需要翻译的原始文本",
+          "required": true
+        },
+        "target_language": {
+          "type": "string",
+          "description": "目标语言，如English、Japanese",
+          "required": false,
+          "default": "English"
+        }
+      },
+      "returns": {
+        "type": "string",
+        "description": "翻译后的文本"
+      },
+      "tags": [
+        "翻译",
+        "多语言",
+        "本地化"
+      ],
+      "examples": [
+        "翻译成英文",
+        "翻译成日文",
+        "英文转中文"
+      ],
+      "version": "1.0.0",
+      "class_name": "TranslationProcessor"
+    },
+    "format_processor": {
+      "name": "format_processor",
+      "description": "格式转换，支持Markdown转HTML、Markdown转纯文本等格式转换",
+      "skill_type": "post_processor",
+      "parameters": {
+        "answer": {
+          "type": "string",
+          "description": "需要转换格式的文本",
+          "required": true
+        },
+        "format_type": {
+          "type": "string",
+          "description": "目标格式：markdown/html/plain_text",
+          "required": false,
+          "default": "markdown"
+        }
+      },
+      "returns": {
+        "type": "string",
+        "description": "转换格式后的文本"
+      },
+      "tags": [
+        "格式转换",
+        "HTML",
+        "纯文本"
+      ],
+      "examples": [
+        "转换为HTML格式",
+        "去掉所有格式",
+        "转为纯文本"
+      ],
+      "version": "1.0.0",
+      "class_name": "FormatProcessor"
+    },
+    "highlight_processor": {
+      "name": "highlight_processor",
+      "description": "关键词高亮，将指定关键词在文本中加粗显示，突出重点信息",
+      "skill_type": "post_processor",
+      "parameters": {
+        "answer": {
+          "type": "string",
+          "description": "需要处理的文本",
+          "required": true
+        },
+        "keywords": {
+          "type": "list",
+          "description": "需要高亮的关键词列表",
+          "required": true
+        }
+      },
+      "returns": {
+        "type": "string",
+        "description": "关键词高亮后的文本"
+      },
+      "tags": [
+        "高亮",
+        "关键词",
+        "重点标记"
+      ],
+      "examples": [
+        "高亮关键词'年假'",
+        "标记重点信息",
+        "突出关键条款"
+      ],
+      "version": "1.0.0",
+      "class_name": "HighlightProcessor"
+    }
+  }
+}
